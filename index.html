@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.R Fashion House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c1f26; --muted:#6b7280;
+    --brand:#1f6f4a; --brand-dark:#155238; --brand-light:#e8f5ef;
+    --danger:#c0392b; --warn:#b8860b; --border:#e5e7eb;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Hind Siliguri',sans-serif;background:var(--bg);color:var(--ink);}
+  button{font-family:inherit;cursor:pointer;transition:all .15s ease;}
+  input,select{font-family:inherit;transition:border-color .15s ease;}
+  input:focus,select:focus{outline:none;border-color:var(--brand)!important;}
+  .card{transition:box-shadow .15s ease;}
+  .card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
+  .stat{transition:transform .15s ease;}
+  .stat:hover{transform:translateY(-2px);}
+  .nav-item{transition:all .15s ease;}
+  .btn:hover, .btn-sm:hover{transform:translateY(-1px);}
+
+  /* ---------- LOGIN ---------- */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand-dark),var(--brand));padding:16px;}
+  .login-box{background:var(--card);padding:32px;border-radius:16px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  .login-box h1{font-size:20px;margin:0 0 4px;color:var(--brand-dark);}
+  .login-box p{color:var(--muted);margin:0 0 20px;font-size:14px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;margin-bottom:5px;color:var(--muted);}
+  .field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px;}
+  .btn{background:var(--brand);color:#fff;border:none;padding:12px 16px;border-radius:8px;font-size:15px;font-weight:600;width:100%;}
+  .btn:hover{background:var(--brand-dark);}
+  .btn-outline{background:#fff;color:var(--brand);border:1px solid var(--brand);}
+  .link-btn{background:none;border:none;color:var(--brand);font-size:13px;text-decoration:underline;padding:0;width:auto;}
+  .auth-toggle{text-align:center;margin-top:14px;font-size:13px;color:var(--muted);}
+  .error-msg{background:#fdecea;color:var(--danger);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+  .success-msg{background:#e8f5ef;color:var(--brand-dark);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+
+  /* ---------- APP SHELL ---------- */
+  #appShell{display:none;min-height:100vh;}
+  .sidebar{width:220px;background:var(--brand-dark);color:#fff;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;box-shadow:2px 0 12px rgba(0,0,0,.12);}
+  .sidebar .brand{padding:20px 18px;font-weight:700;font-size:17px;border-bottom:1px solid rgba(255,255,255,.12);}
+  .sidebar .brand small{display:block;font-weight:400;font-size:12px;opacity:.7;margin-top:2px;}
+  .nav-item{padding:13px 18px;color:#dfe8e3;text-decoration:none;display:flex;align-items:center;gap:10px;font-size:15px;border-left:3px solid transparent;}
+  .nav-item.active,.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;border-left-color:#fff;}
+  .sidebar .logout{margin-top:auto;padding:16px 18px;border-top:1px solid rgba(255,255,255,.12);}
+  .main{margin-left:220px;flex:1;padding:22px 26px;width:calc(100% - 220px);}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .topbar h2{margin:0;font-size:21px;}
+  .topbar .sub{color:var(--muted);font-size:13px;}
+
+  .mobile-topbar{display:none;background:var(--brand-dark);color:#fff;padding:14px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .mobile-topbar button{background:none;border:none;color:#fff;font-size:22px;}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px;}
+  .grid{display:grid;gap:14px;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:2fr 1fr;}
+  @media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;}}
+
+  .stat{padding:16px;border-radius:var(--radius);color:#fff;}
+  .stat .num{font-size:26px;font-weight:700;}
+  .stat .label{font-size:13px;opacity:.9;}
+  .stat.green{background:linear-gradient(135deg,#1f6f4a,#2c8f61);}
+  .stat.blue{background:linear-gradient(135deg,#1e5a8f,#2b7bc4);}
+  .stat.orange{background:linear-gradient(135deg,#b8860b,#d9a520);}
+  .stat.red{background:linear-gradient(135deg,#8b2e22,#c0392b);}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;}
+  tr:hover td{background:#fafbfb;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+  .toolbar input,.toolbar select{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:14px;}
+  .toolbar input[type=search]{flex:1;min-width:180px;}
+  .btn-sm{padding:8px 14px;border-radius:7px;font-size:13.5px;background:var(--brand);color:#fff;border:none;}
+  .btn-sm.gray{background:#e5e7eb;color:var(--ink);}
+  .btn-sm.danger{background:#fdecea;color:var(--danger);}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .badge.low{background:#fdecea;color:var(--danger);}
+  .badge.ok{background:#e8f5ef;color:var(--brand-dark);}
+  .badge.qr{background:#eef2ff;color:#3730a3;}
+  .badge.barcode{background:#fff7ed;color:#9a3412;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;}
+  .modal h3{margin:0 0 16px;font-size:18px;}
+  .modal-close{float:right;background:none;border:none;font-size:20px;color:var(--muted);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* ---------- POS ---------- */
+  .pos-layout{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;}
+  @media(max-width:1000px){.pos-layout{grid-template-columns:1fr;}}
+  .scan-box{display:flex;gap:8px;margin-bottom:14px;}
+  .scan-box input{flex:1;padding:13px;font-size:16px;border:2px solid var(--brand);border-radius:8px;}
+  .cart-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .cart-row .name{flex:1;font-size:14px;}
+  .cart-row .name small{display:block;color:var(--muted);font-size:12px;}
+  .cart-row input[type=number]{width:58px;padding:6px;border:1px solid var(--border);border-radius:6px;text-align:center;}
+  .cart-row .rm{background:none;border:none;color:var(--danger);font-size:18px;}
+  .summary-line{display:flex;justify-content:space-between;padding:6px 0;font-size:14.5px;}
+  .summary-line.total{font-size:19px;font-weight:700;border-top:2px solid var(--ink);padding-top:10px;margin-top:6px;}
+  #camScanBox{width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;display:none;}
+
+  /* ---------- PRINT MEMO ---------- */
+  #printArea{display:none;}
+  @media print{
+    body *{visibility:hidden;}
+    #printArea, #printArea *{visibility:visible;}
+    #printArea{display:block;position:absolute;top:0;left:0;width:100%;}
+    .no-print{display:none!important;}
+  }
+  .memo-thermal{width:78mm;margin:0 auto;font-family:'Courier New',monospace;font-size:12px;padding:6px;}
+  .memo-thermal h2{text-align:center;font-size:15px;margin:2px 0;}
+  .memo-thermal .center{text-align:center;}
+  .memo-thermal hr{border:none;border-top:1px dashed #000;margin:6px 0;}
+  .memo-thermal table{width:100%;font-size:11.5px;}
+  .memo-thermal td,.memo-thermal th{padding:2px 0;border:none;}
+  .memo-a4{width:100%;max-width:700px;margin:0 auto;padding:30px;font-family:'Hind Siliguri',sans-serif;}
+  .memo-a4 h1{color:var(--brand-dark);}
+  .memo-a4 table{width:100%;border-collapse:collapse;margin-top:14px;}
+  .memo-a4 th,.memo-a4 td{border:1px solid #ccc;padding:8px;font-size:14px;}
+
+  /* ---------- QR LABEL PRINT ---------- */
+  #qrPrintArea{display:none;}
+  @media print{
+    #qrPrintArea{display:block!important;}
+  }
+  .qr-label-sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .qr-label{border:1px dashed #999;padding:6px;text-align:center;font-size:10px;}
+  .qr-label img,.qr-label canvas{width:70px;height:70px;}
+
+  @media(max-width:900px){
+    .sidebar{display:none;}
+    .main{margin-left:0;width:100%;padding:14px;}
+    .mobile-topbar{display:flex;}
+    .sidebar.open{display:flex;z-index:100;width:230px;}
+    .grid-4{grid-template-columns:repeat(2,1fr);}
+  }
+  .overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;}
+  .overlay-mobile.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h1>👕 কাপড়ের দোকান POS</h1>
+    <p id="authSubtitle">আপনার দোকানের অ্যাকাউন্টে লগইন করুন</p>
+    <div class="error-msg" id="authError"></div>
+    <div class="success-msg" id="authSuccess"></div>
+
+    <div id="signupExtra" style="display:none">
+      <div class="field"><label>দোকানের নাম</label><input type="text" id="shopNameInput" placeholder="যেমন: নিউ ফ্যাশন হাউস"></div>
+      <div class="field"><label>আপনার নাম</label><input type="text" id="fullNameInput" placeholder="আপনার নাম"></div>
+    </div>
+    <div class="field"><label>ইমেইল</label><input type="email" id="emailInput" placeholder="you@example.com"></div>
+    <div class="field"><label>পাসওয়ার্ড</label><input type="password" id="passwordInput" placeholder="••••••••"></div>
+
+    <button class="btn" id="authSubmitBtn" onclick="handleAuthSubmit()">লগইন করুন</button>
+    <div class="auth-toggle">
+      <span id="toggleText">অ্যাকাউন্ট নেই?</span>
+      <button class="link-btn" id="toggleModeBtn" onclick="toggleAuthMode()">নতুন দোকান রেজিস্টার করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="appShell">
+  <div class="overlay-mobile" id="mobileOverlay" onclick="closeSidebar()"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="brand" style="display:flex;align-items:center;gap:10px;">
+      <img id="sidebarLogo" src="" style="display:none;width:36px;height:36px;border-radius:8px;object-fit:cover;">
+      <div><span id="shopNameDisplay">দোকান</span><small id="userNameDisplay" style="display:block;"></small></div>
+    </div>
+    <a href="#" class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">📊 ড্যাশবোর্ড</a>
+    <a href="#" class="nav-item" data-page="stock" onclick="switchPage('stock')">📦 স্টক / পণ্য</a>
+    <a href="#" class="nav-item" data-page="pos" onclick="switchPage('pos')">🧾 বিক্রয় (POS)</a>
+    <a href="#" class="nav-item" data-page="report" onclick="switchPage('report')">📅 দিনের হিসাব</a>
+    <a href="#" class="nav-item" data-page="ledger" onclick="switchPage('ledger')">📒 বাকির খাতা</a>
+    <a href="#" class="nav-item" data-page="settings" onclick="switchPage('settings')">⚙️ সেটিংস</a>
+    <div class="logout"><button class="btn btn-outline" onclick="logout()">লগআউট</button></div>
+  </nav>
+
+  <div style="flex:1;width:100%;">
+    <div class="mobile-topbar">
+      <button onclick="openSidebar()">☰</button>
+      <strong id="mobileTitle">ড্যাশবোর্ড</strong>
+      <span></span>
+    </div>
+
+    <div class="main">
+      <!-- ===== DASHBOARD ===== -->
+      <div class="page" id="page-dashboard">
+        <div class="topbar"><div><h2>ড্যাশবোর্ড</h2><div class="sub" id="todayDateLabel"></div></div></div>
+        <div class="grid grid-4">
+          <div class="stat green"><div class="num" id="statTodaySales">৳0</div><div class="label">আজকের বিক্রি</div></div>
+          <div class="stat blue"><div class="num" id="statTodayInvoices">0</div><div class="label">আজকের মেমো সংখ্যা</div></div>
+          <div class="stat orange"><div class="num" id="statTodayDiscount">৳0</div><div class="label">আজকের ডিসকাউন্ট</div></div>
+          <div class="stat red"><div class="num" id="statLowStock">0</div><div class="label">কম স্টক পণ্য</div></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">সাম্প্রতিক বিক্রি</h3>
+          <table><thead><tr><th>মেমো নং</th><th>সময়</th><th>আইটেম</th><th>টাকা</th><th>পেমেন্ট</th></tr></thead>
+          <tbody id="recentSalesBody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== STOCK ===== -->
+      <div class="page" id="page-stock" style="display:none">
+        <div class="topbar">
+          <div><h2>স্টক / পণ্য</h2><div class="sub">মাল এন্ট্রি, QR কোড ও বারকোড ম্যানেজমেন্ট</div></div>
+          <button class="btn-sm" style="width:auto" onclick="openProductModal()">+ নতুন পণ্য</button>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="productSearch" placeholder="নাম, কোড বা ক্যাটাগরি দিয়ে খুঁজুন..." oninput="renderProducts()">
+          <select id="lowStockFilter" onchange="renderProducts()">
+            <option value="">সব পণ্য</option>
+            <option value="low">শুধু কম স্টক (≤5)</option>
+          </select>
+          <button class="btn-sm gray" style="width:auto" onclick="printSelectedLabels()">🖨️ নির্বাচিত QR লেবেল প্রিন্ট</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th><input type="checkbox" id="selectAllProducts" onchange="toggleSelectAll(this)"></th><th>পণ্য</th><th>কোড</th><th>দাম</th><th>স্টক</th><th></th></tr></thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== POS ===== -->
+      <div class="page" id="page-pos" style="display:none">
+        <div class="topbar"><div><h2>বিক্রয় (POS)</h2><div class="sub">স্ক্যান করুন অথবা কোড টাইপ করুন</div></div></div>
+        <div class="pos-layout">
+          <div class="card">
+            <div class="scan-box">
+              <input type="text" id="scanInput" placeholder="🔍 QR/বারকোড স্ক্যান করুন বা কোড লিখে Enter চাপুন" autocomplete="off">
+              <button class="btn-sm" style="width:auto" onclick="toggleCamScan()">📷 ক্যামেরা স্ক্যান</button>
+            </div>
+            <div id="camScanBox"><div id="camReader"></div></div>
+            <div id="cartList"></div>
+            <div id="emptyCartMsg" style="color:var(--muted);text-align:center;padding:30px 0;">এখনও কোনো পণ্য যোগ হয়নি</div>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0">বিল সামারি</h3>
+            <div class="field"><label>গ্রাহকের নাম (ঐচ্ছিক)</label><input type="text" id="custName"></div>
+            <div class="field"><label>মোবাইল নাম্বার (ঐচ্ছিক)</label><input type="text" id="custPhone"></div>
+            <div class="summary-line"><span>সাবটোটাল</span><span id="sumSubtotal">৳0</span></div>
+            <div class="field">
+              <label>ডিসকাউন্ট</label>
+              <div style="display:flex;gap:8px;">
+                <input type="number" id="discountValue" value="0" min="0" oninput="renderCart()" style="flex:1;padding:9px;border:1px solid var(--border);border-radius:8px;">
+                <select id="discountType" onchange="renderCart()" style="padding:9px;border:1px solid var(--border);border-radius:8px;">
+                  <option value="amount">৳ টাকা</option>
+                  <option value="percent">% পার্সেন্ট</option>
+                </select>
+              </div>
+            </div>
+            <div class="summary-line total"><span>সর্বমোট</span><span id="sumTotal">৳0</span></div>
+            <div class="field">
+              <label>পেমেন্ট মাধ্যম</label>
+              <select id="paymentMethod" onchange="onPaymentMethodChange()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;">
+                <option value="cash">নগদ</option>
+                <option value="bkash">বিকাশ</option>
+                <option value="nagad">নগদ (Nagad)</option>
+                <option value="card">কার্ড</option>
+                <option value="due">বাকি</option>
+              </select>
+            </div>
+            <div class="field" id="advancePaidField" style="display:none">
+              <label>এখন কত পরিশোধ করছে (৳) — বাকি থাকবে বাকিটা</label>
+              <input type="number" id="advancePaid" value="0" oninput="renderCart()">
+            </div>
+            <div class="field">
+              <label>প্রিন্ট ফরম্যাট</label>
+              <select id="printFormat" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;">
+                <option value="thermal">থার্মাল রিসিট (৭৮মিমি)</option>
+                <option value="a4">A4 মেমো</option>
+              </select>
+            </div>
+            <button class="btn" onclick="checkout()">✅ বিক্রি সম্পন্ন করুন ও প্রিন্ট</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DAY REPORT ===== -->
+      <div class="page" id="page-report" style="display:none">
+        <div class="topbar"><div><h2>দিনের হিসাব</h2><div class="sub">তারিখ অনুযায়ী সম্পূর্ণ বেচাকেনার হিসাব</div></div></div>
+        <div class="toolbar">
+          <input type="date" id="reportDate" onchange="loadDayReport()">
+          <button class="btn-sm gray" style="width:auto" onclick="printDayReport()">🖨️ প্রিন্ট</button>
+          <input type="search" id="invoiceSearch" placeholder="🔍 যেকোনো তারিখে মেমো নং বা গ্রাহকের নাম দিয়ে খুঁজুন..." style="flex:1;min-width:220px" oninput="searchAllInvoices()">
+        </div>
+        <div id="searchResultsCard" class="card" style="display:none">
+          <h3 style="margin-top:0">খোঁজার ফলাফল</h3>
+          <table><thead><tr><th>মেমো নং</th><th>তারিখ</th><th>গ্রাহক</th><th>মোট</th><th>পেমেন্ট</th><th></th></tr></thead>
+          <tbody id="searchResultsBody"></tbody></table>
+        </div>
+        <div class="grid grid-4" id="reportStats"></div>
+        <div class="card">
+          <h3 style="margin-top:0">সব মেমো (নির্বাচিত দিনের)</h3>
+          <table><thead><tr><th>মেমো নং</th><th>সময়</th><th>গ্রাহক</th><th>আইটেম</th><th>ডিসকাউন্ট</th><th>মোট</th><th>পেমেন্ট</th></tr></thead>
+          <tbody id="reportBody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== LEDGER (বাকির খাতা) ===== -->
+      <div class="page" id="page-ledger" style="display:none">
+        <div class="topbar">
+          <div><h2>বাকির খাতা</h2><div class="sub">গ্রাহকদের বাকি ও জমার হিসাব</div></div>
+          <button class="btn-sm" style="width:auto" onclick="openNewCustomerModal()">+ নতুন গ্রাহক</button>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="ledgerSearch" placeholder="নাম বা মোবাইল দিয়ে খুঁজুন..." oninput="renderLedger()">
+          <select id="ledgerSort" onchange="renderLedger()">
+            <option value="due_desc">বেশি বাকি আগে</option>
+            <option value="old">পুরনো গ্রাহক আগে</option>
+            <option value="new">নতুন গ্রাহক আগে</option>
+          </select>
+          <input type="number" id="ledgerMinDue" placeholder="সর্বনিম্ন বাকি" style="width:120px" oninput="renderLedger()">
+          <input type="number" id="ledgerMaxDue" placeholder="সর্বোচ্চ বাকি" style="width:120px" oninput="renderLedger()">
+        </div>
+        <div class="grid grid-4" id="ledgerStats"></div>
+        <div class="card">
+          <table>
+            <thead><tr><th>গ্রাহক</th><th>মোবাইল</th><th>মোট বাকি</th><th></th></tr></thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div class="page" id="page-settings" style="display:none">
+        <div class="topbar"><div><h2>সেটিংস</h2></div></div>
+        <div class="card">
+          <h3 style="margin-top:0">দোকানের তথ্য</h3>
+          <div class="field"><label>দোকানের নাম</label><input type="text" id="settingsShopName"></div>
+          <div class="field"><label>ঠিকানা / ফোন (মেমোতে দেখাবে)</label><input type="text" id="settingsShopAddr" placeholder="ঠিকানা, ফোন নাম্বার"></div>
+          <div class="field">
+            <label>দোকানের লোগো</label>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div id="logoPreview" style="width:64px;height:64px;border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;">🖼️</div>
+              <input type="file" id="logoUploadInput" accept="image/*" onchange="handleLogoUpload(event)">
+            </div>
+            <div class="sub" style="margin-top:6px;">লোগো আপলোড করলে সাইডবার ও মেমোর উপরে দেখাবে</div>
+          </div>
+          <button class="btn-sm" style="width:auto" onclick="saveShopSettings()">সংরক্ষণ করুন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PRODUCT MODAL ================= -->
+<div class="modal-overlay" id="productModalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeProductModal()">✕</button>
+    <h3 id="productModalTitle">নতুন পণ্য যোগ করুন</h3>
+    <input type="hidden" id="editProductId">
+    <div class="field"><label>পণ্যের নাম</label><input type="text" id="pName" placeholder="যেমন: পাঞ্জাবি - সাদা"></div>
+    <div class="field-row">
+      <div class="field"><label>ক্যাটাগরি</label><input type="text" id="pCategory" placeholder="শার্ট/প্যান্ট/শাড়ি"></div>
+      <div class="field"><label>সাইজ</label><input type="text" id="pSize" placeholder="M/L/XL"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>কেনা দাম</label><input type="number" id="pCost" value="0"></div>
+      <div class="field"><label>বিক্রয় দাম</label><input type="number" id="pPrice" value="0"></div>
+    </div>
+    <div class="field"><label>স্টক পরিমাণ</label><input type="number" id="pStock" value="1"></div>
+
+    <div class="field">
+      <label>কোড টাইপ</label>
+      <select id="pCodeType" onchange="onCodeTypeChange()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;">
+        <option value="qr">নতুন পণ্য — সিস্টেম QR কোড জেনারেট করবে</option>
+        <option value="barcode">পুরোনো/ব্র্যান্ডের বারকোড স্ক্যান করে বসাবো</option>
+      </select>
+    </div>
+    <div class="field" id="barcodeScanField" style="display:none">
+      <label>বারকোড স্ক্যান/টাইপ করুন</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="pCode" placeholder="স্ক্যানার দিয়ে স্ক্যান করুন">
+        <button class="btn-sm gray" style="width:auto" onclick="scanIntoProductForm()">📷</button>
+      </div>
+    </div>
+    <div id="qrPreviewBox" style="text-align:center;margin:10px 0;"></div>
+
+    <button class="btn" onclick="saveProduct()">সংরক্ষণ করুন</button>
+  </div>
+</div>
+
+<!-- ================= NEW CUSTOMER MODAL ================= -->
+<div class="modal-overlay" id="customerModalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeNewCustomerModal()">✕</button>
+    <h3>নতুন গ্রাহক (বাকির খাতা)</h3>
+    <div class="field"><label>গ্রাহকের নাম</label><input type="text" id="ncName"></div>
+    <div class="field"><label>মোবাইল নাম্বার</label><input type="text" id="ncPhone"></div>
+    <div class="field"><label>ঠিকানা (ঐচ্ছিক)</label><input type="text" id="ncAddress"></div>
+    <div class="field-row">
+      <div class="field"><label>শুরুর বাকি (৳)</label><input type="number" id="ncInitialDue" value="0"></div>
+      <div class="field"><label>তারিখ</label><input type="date" id="ncDate"></div>
+    </div>
+    <button class="btn" onclick="saveNewCustomer()">সংরক্ষণ করুন</button>
+  </div>
+</div>
+
+<!-- ================= CUSTOMER DETAIL / TRANSACTION MODAL ================= -->
+<div class="modal-overlay" id="customerDetailOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCustomerDetail()">✕</button>
+    <h3 id="cdName">গ্রাহক</h3>
+    <div class="sub" id="cdPhone" style="color:var(--muted);margin-bottom:10px;"></div>
+    <div class="card" style="background:var(--brand-light);text-align:center;margin-bottom:14px;">
+      <div style="font-size:13px;color:var(--muted)">বর্তমান মোট বাকি</div>
+      <div style="font-size:26px;font-weight:700;color:var(--brand-dark)" id="cdDueAmount">৳0</div>
+    </div>
+    <div class="field-row" style="margin-bottom:14px;">
+      <button class="btn-sm" onclick="openLedgerEntryForm('জমা')">💰 জমা নিচ্ছি</button>
+      <button class="btn-sm gray" onclick="openLedgerEntryForm('বাকি')">➕ বাকি দিচ্ছি</button>
+    </div>
+    <div id="ledgerEntryForm" style="display:none;margin-bottom:14px;">
+      <div class="field"><label id="ledgerEntryLabel">পরিমাণ</label><input type="number" id="ledgerEntryAmount" value="0"></div>
+      <div class="field"><label>তারিখ</label><input type="date" id="ledgerEntryDate"></div>
+      <div class="field"><label>নোট (ঐচ্ছিক)</label><input type="text" id="ledgerEntryNote"></div>
+      <button class="btn-sm" style="width:100%" onclick="submitLedgerEntry()">নিশ্চিত করুন</button>
+    </div>
+    <h4>লেনদেনের ইতিহাস</h4>
+    <table><tbody id="cdHistoryBody"></tbody></table>
+  </div>
+</div>
+
+<!-- ================= PRINT AREAS (hidden, shown only on print) ================= -->
+<div id="printArea"></div>
+<div id="qrPrintArea"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
