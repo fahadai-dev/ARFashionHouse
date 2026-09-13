@@ -158,7 +158,7 @@
 <!-- ================= LOGIN ================= -->
 <div id="loginScreen">
   <div class="login-box">
-    <h1>A.R Fashion House</h1>
+    <h1>👕 কাপড়ের দোকান POS</h1>
     <p id="authSubtitle">আপনার দোকানের অ্যাকাউন্টে লগইন করুন</p>
     <div class="error-msg" id="authError"></div>
     <div class="success-msg" id="authSuccess"></div>
@@ -373,13 +373,31 @@
     <div class="field"><label>পণ্যের নাম</label><input type="text" id="pName" placeholder="যেমন: পাঞ্জাবি - সাদা"></div>
     <div class="field-row">
       <div class="field"><label>ক্যাটাগরি</label><input type="text" id="pCategory" placeholder="শার্ট/প্যান্ট/শাড়ি"></div>
-      <div class="field"><label>সাইজ</label><input type="text" id="pSize" placeholder="M/L/XL"></div>
+      <div class="field" id="singleSizeField"><label>সাইজ</label><input type="text" id="pSize" placeholder="M/L/XL"></div>
     </div>
     <div class="field-row">
       <div class="field"><label>কেনা দাম</label><input type="number" id="pCost" value="0"></div>
       <div class="field"><label>বিক্রয় দাম</label><input type="number" id="pPrice" value="0"></div>
     </div>
-    <div class="field"><label>স্টক পরিমাণ</label><input type="number" id="pStock" value="1"></div>
+    <div class="field" id="singleStockField"><label>স্টক পরিমাণ</label><input type="number" id="pStock" value="1"></div>
+
+    <div class="field" id="multiSizeToggleField" style="display:none">
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;">
+        <input type="checkbox" id="multiSizeMode" onchange="onMultiSizeToggle()" style="width:auto;">
+        একসাথে একাধিক সাইজ যোগ করুন (নাম-দাম এক, প্রতিটা সাইজের জন্য আলাদা QR ও আলাদা স্টক হবে)
+      </label>
+    </div>
+    <div id="multiSizeGrid" style="display:none;margin-bottom:14px;">
+      <label style="display:block;margin-bottom:6px;">কোন কোন সাইজে কত স্টক আছে (খালি/০ রাখলে সেই সাইজ তৈরি হবে না)</label>
+      <div class="field-row" style="grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div><label style="font-size:12px;">S</label><input type="number" class="msSizeStock" data-size="S" placeholder="0"></div>
+        <div><label style="font-size:12px;">M</label><input type="number" class="msSizeStock" data-size="M" placeholder="0"></div>
+        <div><label style="font-size:12px;">L</label><input type="number" class="msSizeStock" data-size="L" placeholder="0"></div>
+        <div><label style="font-size:12px;">XL</label><input type="number" class="msSizeStock" data-size="XL" placeholder="0"></div>
+        <div><label style="font-size:12px;">XXL</label><input type="number" class="msSizeStock" data-size="XXL" placeholder="0"></div>
+        <div><label style="font-size:12px;">Free Size</label><input type="number" class="msSizeStock" data-size="Free Size" placeholder="0"></div>
+      </div>
+    </div>
 
     <div class="field">
       <label>কোড টাইপ</label>

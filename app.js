@@ -90,13 +90,21 @@ async function handleAuthSubmit() {
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
-      options: { data: { shop_name: shopName, full_name: fullName } },
     });
     if (error) {
       showAuthError(error.message);
       return;
     }
     if (data.session) {
+      const setupError = await createShopAndProfile(
+        data.user,
+        shopName,
+        fullName,
+      );
+      if (setupError) {
+        showAuthError("দোকান তৈরি করতে সমস্যা হয়েছে: " + setupError);
+        return;
+      }
       await bootAfterLogin(data.user);
     } else {
       showAuthSuccess("অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করুন।");
@@ -113,6 +121,28 @@ async function handleAuthSubmit() {
     }
     await bootAfterLogin(data.user);
   }
+}
+
+// সাইনআপের পরপরই নিজের দোকান আর নিজের owner প্রোফাইল বানিয়ে দেয়
+async function createShopAndProfile(user, shopName, fullName) {
+  const { data: shop, error: shopErr } = await supabaseClient
+    .from("shops")
+    .insert({ name: shopName, owner_id: user.id })
+    .select()
+    .single();
+  if (shopErr) return shopErr.message;
+
+  const { error: profileErr } = await supabaseClient
+    .from("profiles")
+    .insert({
+      id: user.id,
+      shop_id: shop.id,
+      full_name: fullName,
+      role: "owner",
+    });
+  if (profileErr) return profileErr.message;
+
+  return null;
 }
 
 async function logout() {
@@ -291,6 +321,9 @@ function openProductModal() {
   document.getElementById("pStock").value = 1;
   document.getElementById("pCodeType").value = "qr";
   document.getElementById("pCode").value = "";
+  document.getElementById("multiSizeMode").checked = false;
+  document.querySelectorAll(".msSizeStock").forEach((i) => (i.value = ""));
+  onMultiSizeToggle();
   onCodeTypeChange();
   document.getElementById("productModalOverlay").classList.add("show");
 }
@@ -300,9 +333,28 @@ function closeProductModal() {
 }
 function onCodeTypeChange() {
   const type = document.getElementById("pCodeType").value;
+  const isNew = !document.getElementById("editProductId").value;
   document.getElementById("barcodeScanField").style.display =
     type === "barcode" ? "block" : "none";
+  document.getElementById("multiSizeToggleField").style.display =
+    type === "qr" && isNew ? "block" : "none";
+  if (type === "barcode") {
+    document.getElementById("multiSizeMode").checked = false;
+    onMultiSizeToggle();
+  }
   document.getElementById("qrPreviewBox").innerHTML = "";
+}
+function onMultiSizeToggle() {
+  const isMulti = document.getElementById("multiSizeMode").checked;
+  document.getElementById("singleSizeField").style.display = isMulti
+    ? "none"
+    : "block";
+  document.getElementById("singleStockField").style.display = isMulti
+    ? "none"
+    : "block";
+  document.getElementById("multiSizeGrid").style.display = isMulti
+    ? "block"
+    : "none";
 }
 
 function editProduct(id) {
@@ -318,6 +370,8 @@ function editProduct(id) {
   document.getElementById("pStock").value = p.stock_qty;
   document.getElementById("pCodeType").value = p.code_type;
   document.getElementById("pCode").value = p.code;
+  document.getElementById("multiSizeMode").checked = false;
+  onMultiSizeToggle();
   onCodeTypeChange();
   document.getElementById("productModalOverlay").classList.add("show");
 }
@@ -330,8 +384,52 @@ async function saveProduct() {
     return;
   }
   const codeType = document.getElementById("pCodeType").value;
-  let code = document.getElementById("pCode").value.trim();
+  const isMulti =
+    !id &&
+    codeType === "qr" &&
+    document.getElementById("multiSizeMode").checked;
 
+  if (isMulti) {
+    const category = document.getElementById("pCategory").value.trim();
+    const cost = Number(document.getElementById("pCost").value) || 0;
+    const price = Number(document.getElementById("pPrice").value) || 0;
+    const sizeInputs = Array.from(document.querySelectorAll(".msSizeStock"))
+      .map((i) => ({ size: i.dataset.size, stock: Number(i.value) || 0 }))
+      .filter((x) => x.stock > 0);
+    if (!sizeInputs.length) {
+      alert("অন্তত একটা সাইজে স্টক পরিমাণ দিন");
+      return;
+    }
+
+    const payloads = sizeInputs.map((s, idx) => ({
+      shop_id: CURRENT_SHOP.id,
+      name,
+      category,
+      size: s.size,
+      cost_price: cost,
+      sell_price: price,
+      stock_qty: s.stock,
+      code_type: "qr",
+      code:
+        "QR-" +
+        Date.now().toString(36).toUpperCase() +
+        "-" +
+        idx +
+        "-" +
+        Math.floor(Math.random() * 900 + 100),
+      updated_at: new Date().toISOString(),
+    }));
+    const { error } = await supabaseClient.from("products").insert(payloads);
+    if (error) {
+      alert("সেভ করতে সমস্যা হয়েছে: " + error.message);
+      return;
+    }
+    closeProductModal();
+    await loadProducts();
+    return;
+  }
+
+  let code = document.getElementById("pCode").value.trim();
   if (codeType === "qr" && !id) {
     code =
       "QR-" +
@@ -524,6 +622,7 @@ function addToCart(product) {
       code: product.code,
       qty: 1,
       price: Number(product.sell_price),
+      original_price: Number(product.sell_price),
       stock_qty: product.stock_qty,
     });
   }
@@ -535,6 +634,12 @@ function updateCartQty(productId, qty) {
   if (!item) return;
   qty = Math.max(1, Math.min(Number(qty) || 1, item.stock_qty));
   item.qty = qty;
+  renderCart();
+}
+function updateCartPrice(productId, price) {
+  const item = CART.find((c) => c.product_id === productId);
+  if (!item) return;
+  item.price = Math.max(0, Number(price) || 0);
   renderCart();
 }
 function removeFromCart(productId) {
@@ -558,7 +663,9 @@ function renderCart() {
   list.innerHTML = CART.map(
     (c) => `
     <div class="cart-row">
-      <div class="name">${escapeHtml(c.name)}<small>৳${c.price.toFixed(0)} × ${c.qty}</small></div>
+      <div class="name">${escapeHtml(c.name)}
+        <small>একক দাম: ৳<input type="number" value="${c.price}" min="0" style="width:64px;padding:2px 4px;border:1px solid var(--border);border-radius:5px;" onchange="updateCartPrice('${c.product_id}', this.value)"> ${c.price !== c.original_price ? `<span style="color:var(--warn)">(আগে ৳${c.original_price})</span>` : ""}</small>
+      </div>
       <input type="number" min="1" value="${c.qty}" onchange="updateCartQty('${c.product_id}', this.value)">
       <strong>৳${(c.price * c.qty).toFixed(0)}</strong>
       <button class="rm" onclick="removeFromCart('${c.product_id}')">✕</button>
