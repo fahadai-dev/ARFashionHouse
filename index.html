@@ -136,6 +136,8 @@
   /* ---------- QR LABEL PRINT ---------- */
   #qrPrintArea{display:none;}
 @media print{
+  @page {size: 40mm 30mm;
+  margin: 0;}
   #qrPrintArea, #qrPrintArea *{visibility:visible;}
   #qrPrintArea{display:block!important;position:absolute;top:0;left:0;width:100%;}
 }
