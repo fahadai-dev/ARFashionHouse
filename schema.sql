@@ -145,6 +145,10 @@ end;
 $$;
 
 -- নতুন ইউজার সাইনআপ হলে অটোমেটিক shop + profile বানানোর ট্রিগার
+-- (app.js এর signUp() কল এখন shop_name/full_name auth metadata হিসেবে পাঠায়,
+--  আর ক্লায়েন্ট-সাইড থেকে আলাদা করে profile insert করে না —
+--  তাই এই ট্রিগারটাই একমাত্র জায়গা যেখানে shop+profile তৈরি হয়,
+--  ডুপ্লিকেট/কনফ্লিক্ট এরর হওয়ার কোনো সুযোগ নেই)
 create or replace function handle_new_user()
 returns trigger
 language plpgsql
@@ -189,6 +193,13 @@ create policy shops_update on shops for update using (id = my_shop_id() and is_o
 create policy profiles_select on profiles for select using (shop_id = my_shop_id());
 create policy profiles_update_self on profiles for update using (id = auth.uid());
 create policy profiles_insert_owner on profiles for insert with check (shop_id = my_shop_id() and is_owner());
+
+-- নিরাপত্তা ফিক্স: profiles_update_self পলিসিতে with check না থাকায়
+-- যেকোনো লগইন করা ইউজার (staff হলেও) নিজের role='owner' করে ফেলতে পারতো,
+-- অথবা shop_id বদলে অন্য দোকানের ডেটা দেখতে পারতো। নিচের revoke দিয়ে
+-- role ও shop_id কলাম দুটো সাধারণ ইউজার আপডেট করতে পারবে না —
+-- শুধু owner ব্যবহার করে schema পরিবর্তন করতে পারবে (বা add-second-owner.sql দিয়ে)।
+revoke update (role, shop_id) on profiles from authenticated;
 
 -- products: শুধু নিজের shop এর প্রোডাক্ট, সবাই CRUD করতে পারবে (owner+staff)
 create policy products_all on products for all
