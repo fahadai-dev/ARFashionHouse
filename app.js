@@ -125,18 +125,17 @@ async function handleAuthSubmit() {
 
 // সাইনআপের পরপরই নিজের দোকান আর নিজের owner প্রোফাইল বানিয়ে দেয়
 async function createShopAndProfile(user, shopName, fullName) {
-  const { data: shop, error: shopErr } = await supabaseClient
+  const shopId = crypto.randomUUID();
+  const { error: shopErr } = await supabaseClient
     .from("shops")
-    .insert({ name: shopName, owner_id: user.id })
-    .select()
-    .single();
+    .insert({ id: shopId, name: shopName, owner_id: user.id });
   if (shopErr) return shopErr.message;
 
   const { error: profileErr } = await supabaseClient
     .from("profiles")
     .insert({
       id: user.id,
-      shop_id: shop.id,
+      shop_id: shopId,
       full_name: fullName,
       role: "owner",
     });
