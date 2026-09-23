@@ -135,9 +135,10 @@
 
   /* ---------- QR LABEL PRINT ---------- */
   #qrPrintArea{display:none;}
-  @media print{
-    #qrPrintArea{display:block!important;}
-  }
+@media print{
+  #qrPrintArea, #qrPrintArea *{visibility:visible;}
+  #qrPrintArea{display:block!important;position:absolute;top:0;left:0;width:100%;}
+}
   .qr-label-sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
   .qr-label{border:1px dashed #999;padding:6px;text-align:center;font-size:10px;}
   .qr-label img,.qr-label canvas{width:70px;height:70px;}
