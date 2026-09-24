@@ -474,29 +474,61 @@ function printSelectedLabels() {
 async function printLabels(ids) {
   const items = PRODUCTS_CACHE.filter((p) => ids.includes(p.id));
   const area = document.getElementById("qrPrintArea");
+
   const shopName = "A.R Fashion House";
+
+  // Label তৈরি
   area.innerHTML =
     '<div class="qr-label-sheet">' +
     items
       .map(
-        (p) => `
-    <div class="qr-label">
-      <div class="shop-name top">${shopName}</div>
-    <div class="prod-price" style="margin-top:2px;line-height:1;">
-  <span class="mrp-tag">M.R.P</span>${Number(p.sell_price).toFixed(0)}
-</div>
-  `,
+        (p, index) => `
+          <div class="qr-label">
+
+            <div class="shop-name top"
+              style="
+                font-size:18px;
+                font-weight:800;
+                line-height:1;
+                margin-bottom:2px;
+                white-space:nowrap;
+              ">
+              ${shopName}
+            </div>
+
+            <div class="prod-price"
+              style="
+                margin-top:0;
+                line-height:1;
+              ">
+              <span class="mrp-tag">M.R.P</span>
+              ${Number(p.sell_price).toFixed(0)}
+            </div>
+
+            <div class="qr-code-target" data-index="${index}"></div>
+
+          </div>
+        `,
       )
       .join("") +
     "</div>";
 
-  // এখন থেকে code_type যাই হোক না কেন (qr বা barcode), লেবেলে সবসময়
-  // একটা QR কোড ছবিই বসবে — বারকোডের সংখ্যা আর প্লেইন টেক্সট হিসেবে দেখানো হবে না
-  for (const p of items) {
+  // QR Code তৈরি
+  const targets = area.querySelectorAll(".qr-code-target");
+
+  for (let i = 0; i < items.length; i++) {
+    const p = items[i];
+
     const canvas = document.createElement("canvas");
-    await QRCode.toCanvas(canvas, p.code, { width: 88, margin: 1 });
-    document.getElementById("lbl-" + p.id).appendChild(canvas);
+
+    await QRCode.toCanvas(canvas, p.code, {
+      width: 88,
+      margin: 1,
+    });
+
+    targets[i].appendChild(canvas);
   }
+
   setTimeout(() => window.print(), 200);
 }
 
