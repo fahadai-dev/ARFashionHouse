@@ -487,7 +487,7 @@ async function printLabels(ids) {
 
             <div class="shop-name top"
               style="
-                font-size:20px;
+                font-size:21px;
                 font-weight:800;
                 line-height:1;
                 margin-bottom:2px;
