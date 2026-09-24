@@ -146,15 +146,16 @@
   }
   .qr-label-sheet{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(auto-fill, 160px);
     gap:10px;
     margin:0 auto;
     justify-content:center;
   }
   .qr-label{
+    width:160px;
     border:1px solid #ccc;
     border-radius:6px;
-    padding:14px 8px 12px;
+    padding:12px 8px 10px;
     text-align:center;
     font-family:'Hind Siliguri',sans-serif;
     display:flex;
@@ -164,17 +165,18 @@
   }
   .qr-label .shop-name{
     font-weight:800;
-    font-size:17px;
+    font-size:14px;
     color:var(--brand-dark);
-    line-height:1.25;
+    line-height:1.2;
     border-bottom:1.5px solid var(--brand-dark);
     padding-bottom:5px;
     margin:2px 0 8px;
-    word-break:break-word;
     width:100%;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
   .qr-label img,.qr-label canvas{display:block;margin:0 auto 6px;width:88px;height:88px;}
-  .qr-label .prod-name{font-size:11px;font-weight:600;color:#222;margin-bottom:3px;}
   .qr-label .prod-price{font-weight:800;font-size:13px;color:var(--ink);}
   .qr-label .prod-price .mrp-tag{font-weight:700;font-size:13px;color:var(--muted);margin-right:3px;}
 

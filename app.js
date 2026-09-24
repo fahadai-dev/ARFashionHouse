@@ -483,7 +483,6 @@ async function printLabels(ids) {
     <div class="qr-label">
       <div class="shop-name">${shopName}</div>
       <div id="lbl-${p.id}"></div>
-      <div class="prod-name">${escapeHtml(p.name)}</div>
       <div class="prod-price"><span class="mrp-tag">M.R.P</span>৳${Number(p.sell_price).toFixed(0)}</div>
     </div>
   `,
