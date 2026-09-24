@@ -485,32 +485,32 @@ async function printLabels(ids) {
           <div class="qr-label">
 
             <div class="shop-name top"
-              style="
-                font-size:22px;
-                font-weight:800;
-                line-height:1;
-                margin-bottom:2px;
-                white-space:nowrap;
-              ">
-              ${shopName}
-            </div>
+  style="
+    font-size:22px;
+    font-weight:900;
+    line-height:1;
+    margin-bottom:2px;
+    white-space:nowrap;
+  ">
+  ${shopName}
+</div>
 
-            <div class="prod-price"
-              style="
-                margin-top:0;
-                line-height:1;
-                font-size:20px;
-                font-weight:800;
-              ">
-              <span class="mrp-tag"
-                style="font-size:20px;font-weight:800;">
-                M.R.P
-              </span>
+<div class="prod-price"
+  style="
+    margin-top:0;
+    line-height:1;
+    font-size:20px;
+    font-weight:800;
+  ">
+  <span class="mrp-tag"
+    style="font-size:20px;font-weight:800;">
+    M.R.P
+  </span>
 
-              <span style="font-size:22px;font-weight:900;">
-                ${Number(p.sell_price).toFixed(0)}
-              </span>
-            </div>
+  <span style="font-size:22px;font-weight:900;">
+    ${Number(p.sell_price).toFixed(0)}
+  </span>
+</div>
 
             <div class="qr-code-target" data-index="${index}"></div>
 
