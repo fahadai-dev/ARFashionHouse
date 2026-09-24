@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A.R Fashion House</title>
+<title>কাপড়ের দোকান POS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   :root{
@@ -135,15 +135,15 @@
 
   /* ---------- QR LABEL PRINT ---------- */
   #qrPrintArea{display:none;}
-@media print{
-  @page {size: 40mm 30mm;
-  margin: 0;}
-  #qrPrintArea, #qrPrintArea *{visibility:visible;}
-  #qrPrintArea{display:block!important;position:absolute;top:0;left:0;width:100%;}
-}
-  .qr-label-sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .qr-label{border:1px dashed #999;padding:6px;text-align:center;font-size:10px;}
-  .qr-label img,.qr-label canvas{width:70px;height:70px;}
+  @media print{
+    #qrPrintArea{display:block!important;}
+  }
+  .qr-label-sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .qr-label{border:1px solid #ccc;border-radius:6px;padding:8px 6px;text-align:center;font-size:11px;font-family:'Hind Siliguri',sans-serif;}
+  .qr-label .shop-name{font-weight:700;font-size:11px;border-bottom:1.5px solid #000;padding-bottom:3px;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .qr-label img,.qr-label canvas{display:block;margin:0 auto 5px;width:68px;height:68px;}
+  .qr-label .prod-name{font-size:10.5px;color:#333;margin-bottom:2px;}
+  .qr-label .prod-price{font-weight:700;font-size:13px;}
 
   @media(max-width:900px){
     .sidebar{display:none;}

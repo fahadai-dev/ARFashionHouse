@@ -1,6 +1,5 @@
 // ==================================================================
 // কাপড়ের দোকান POS — app.js
-// (ফিক্সড ভার্সন: সাইনআপে shop/profile দুইবার তৈরি হওয়ার বাগ সমাধান করা হয়েছে)
 // ==================================================================
 
 let CURRENT_USER = null;
@@ -88,24 +87,24 @@ async function handleAuthSubmit() {
     const shopName =
       document.getElementById("shopNameInput").value.trim() || "আমার দোকান";
     const fullName = document.getElementById("fullNameInput").value.trim();
-
-    // shop_name/full_name auth metadata হিসেবে পাঠানো হচ্ছে, যাতে
-    // schema.sql এর handle_new_user() ট্রিগার সঠিক নাম দিয়েই
-    // shop + profile তৈরি করে। এখানে client-side থেকে আলাদা করে
-    // shop/profile insert করার দরকার নেই — ট্রিগারই এই কাজ করে,
-    // দুইবার insert করলে profiles.id ডুপ্লিকেট key এরর হতো।
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
-      options: {
-        data: { shop_name: shopName, full_name: fullName },
-      },
     });
     if (error) {
       showAuthError(error.message);
       return;
     }
     if (data.session) {
+      const setupError = await createShopAndProfile(
+        data.user,
+        shopName,
+        fullName,
+      );
+      if (setupError) {
+        showAuthError("দোকান তৈরি করতে সমস্যা হয়েছে: " + setupError);
+        return;
+      }
       await bootAfterLogin(data.user);
     } else {
       showAuthSuccess("অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করুন।");
@@ -122,6 +121,27 @@ async function handleAuthSubmit() {
     }
     await bootAfterLogin(data.user);
   }
+}
+
+// সাইনআপের পরপরই নিজের দোকান আর নিজের owner প্রোফাইল বানিয়ে দেয়
+async function createShopAndProfile(user, shopName, fullName) {
+  const shopId = crypto.randomUUID();
+  const { error: shopErr } = await supabaseClient
+    .from("shops")
+    .insert({ id: shopId, name: shopName, owner_id: user.id });
+  if (shopErr) return shopErr.message;
+
+  const { error: profileErr } = await supabaseClient
+    .from("profiles")
+    .insert({
+      id: user.id,
+      shop_id: shopId,
+      full_name: fullName,
+      role: "owner",
+    });
+  if (profileErr) return profileErr.message;
+
+  return null;
 }
 
 async function logout() {
@@ -476,15 +496,17 @@ function printSelectedLabels() {
 async function printLabels(ids) {
   const items = PRODUCTS_CACHE.filter((p) => ids.includes(p.id));
   const area = document.getElementById("qrPrintArea");
+  const shopName = escapeHtml(CURRENT_SHOP?.name || "");
   area.innerHTML =
     '<div class="qr-label-sheet">' +
     items
       .map(
         (p) => `
     <div class="qr-label">
+      <div class="shop-name">${shopName}</div>
       <div id="lbl-${p.id}"></div>
-      <div>${escapeHtml(p.name)}</div>
-      <div>৳${Number(p.sell_price).toFixed(0)}</div>
+      <div class="prod-name">${escapeHtml(p.name)}</div>
+      <div class="prod-price">৳${Number(p.sell_price).toFixed(0)}</div>
     </div>
   `,
       )
@@ -494,7 +516,7 @@ async function printLabels(ids) {
   for (const p of items) {
     if (p.code_type === "qr") {
       const canvas = document.createElement("canvas");
-      await QRCode.toCanvas(canvas, p.code, { width: 70, margin: 1 });
+      await QRCode.toCanvas(canvas, p.code, { width: 68, margin: 1 });
       document.getElementById("lbl-" + p.id).appendChild(canvas);
     } else {
       document.getElementById("lbl-" + p.id).innerHTML =
