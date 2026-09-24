@@ -481,10 +481,10 @@ async function printLabels(ids) {
       .map(
         (p) => `
     <div class="qr-label">
-      <div class="shop-name top">${shopName}</div>
-      <div class="prod-price"><span class="mrp-tag">M.R.P</span>${Number(p.sell_price).toFixed(0)}</div>
-      <div id="lbl-${p.id}"></div>
-    </div>
+      <div class="shop-name top" style="font-size:18px;font-weight:800;line-height:1;margin-bottom:2px;white-space:nowrap;">${shopName}</div>
+      <div class="prod-price" style="margin-top:2px;line-height:1;">
+  <span class="mrp-tag">M.R.P</span>${Number(p.sell_price).toFixed(0)}
+</div>
   `,
       )
       .join("") +
