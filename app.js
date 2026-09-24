@@ -477,7 +477,6 @@ async function printLabels(ids) {
 
   const shopName = "A.R Fashion House";
 
-  // Label তৈরি
   area.innerHTML =
     '<div class="qr-label-sheet">' +
     items
@@ -487,7 +486,7 @@ async function printLabels(ids) {
 
             <div class="shop-name top"
               style="
-                font-size:22px;
+                font-size:18px;
                 font-weight:800;
                 line-height:1;
                 margin-bottom:2px;
@@ -497,18 +496,30 @@ async function printLabels(ids) {
             </div>
 
             <div class="prod-price"
-  style="margin-top:0;line-height:1;font-size:20px;font-weight:800;">
-  <span class="mrp-tag" style="font-size:20px;font-weight:800;">M.R.P</span>
-  <span style="font-size:22px;font-weight:900;">
-    ${Number(p.sell_price).toFixed(0)}
-  </span>
-</div>
+              style="
+                margin-top:0;
+                line-height:1;
+                font-size:20px;
+                font-weight:800;
+              ">
+              <span class="mrp-tag"
+                style="font-size:20px;font-weight:800;">
+                M.R.P
+              </span>
+
+              <span style="font-size:22px;font-weight:900;">
+                ${Number(p.sell_price).toFixed(0)}
+              </span>
+            </div>
+
+            <div class="qr-code-target" data-index="${index}"></div>
+
+          </div>
         `,
       )
       .join("") +
     "</div>";
 
-  // QR Code তৈরি
   const targets = area.querySelectorAll(".qr-code-target");
 
   for (let i = 0; i < items.length; i++) {
@@ -526,7 +537,6 @@ async function printLabels(ids) {
 
   setTimeout(() => window.print(), 200);
 }
-
 // ---------------------------------------------------------------
 // CAMERA SCANNER (shared by POS + product form)
 // ---------------------------------------------------------------
