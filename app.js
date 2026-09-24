@@ -87,24 +87,23 @@ async function handleAuthSubmit() {
     const shopName =
       document.getElementById("shopNameInput").value.trim() || "আমার দোকান";
     const fullName = document.getElementById("fullNameInput").value.trim();
+
+    // shop_name/full_name auth metadata হিসেবে পাঠানো হচ্ছে, যাতে
+    // schema.sql এর handle_new_user() ট্রিগার সঠিক নাম দিয়েই
+    // shop + profile তৈরি করে। client-side থেকে আলাদা করে
+    // shop/profile insert করার দরকার নেই।
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
+      options: {
+        data: { shop_name: shopName, full_name: fullName },
+      },
     });
     if (error) {
       showAuthError(error.message);
       return;
     }
     if (data.session) {
-      const setupError = await createShopAndProfile(
-        data.user,
-        shopName,
-        fullName,
-      );
-      if (setupError) {
-        showAuthError("দোকান তৈরি করতে সমস্যা হয়েছে: " + setupError);
-        return;
-      }
       await bootAfterLogin(data.user);
     } else {
       showAuthSuccess("অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করুন।");
@@ -121,27 +120,6 @@ async function handleAuthSubmit() {
     }
     await bootAfterLogin(data.user);
   }
-}
-
-// সাইনআপের পরপরই নিজের দোকান আর নিজের owner প্রোফাইল বানিয়ে দেয়
-async function createShopAndProfile(user, shopName, fullName) {
-  const shopId = crypto.randomUUID();
-  const { error: shopErr } = await supabaseClient
-    .from("shops")
-    .insert({ id: shopId, name: shopName, owner_id: user.id });
-  if (shopErr) return shopErr.message;
-
-  const { error: profileErr } = await supabaseClient
-    .from("profiles")
-    .insert({
-      id: user.id,
-      shop_id: shopId,
-      full_name: fullName,
-      role: "owner",
-    });
-  if (profileErr) return profileErr.message;
-
-  return null;
 }
 
 async function logout() {
@@ -513,15 +491,12 @@ async function printLabels(ids) {
       .join("") +
     "</div>";
 
+  // এখন থেকে code_type যাই হোক না কেন (qr বা barcode), লেবেলে সবসময়
+  // একটা QR কোড ছবিই বসবে — বারকোডের সংখ্যা আর প্লেইন টেক্সট হিসেবে দেখানো হবে না
   for (const p of items) {
-    if (p.code_type === "qr") {
-      const canvas = document.createElement("canvas");
-      await QRCode.toCanvas(canvas, p.code, { width: 88, margin: 1 });
-      document.getElementById("lbl-" + p.id).appendChild(canvas);
-    } else {
-      document.getElementById("lbl-" + p.id).innerHTML =
-        `<div style="font-family:monospace;font-size:9px;border:1px solid #000;padding:4px">${escapeHtml(p.code)}</div>`;
-    }
+    const canvas = document.createElement("canvas");
+    await QRCode.toCanvas(canvas, p.code, { width: 88, margin: 1 });
+    document.getElementById("lbl-" + p.id).appendChild(canvas);
   }
   setTimeout(() => window.print(), 200);
 }
