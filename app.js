@@ -482,7 +482,7 @@ async function printLabels(ids) {
         (p) => `
     <div class="qr-label">
       <div class="shop-name top">${shopName}</div>
-      <div class="prod-price"><span class="mrp-tag">M.R.P</span>৳${Number(p.sell_price).toFixed(0)}</div>
+      <div class="prod-price"><span class="mrp-tag">M.R.P</span>${Number(p.sell_price).toFixed(0)}</div>
       <div id="lbl-${p.id}"></div>
       <div class="shop-name bottom">${shopName}</div>
     </div>
