@@ -497,20 +497,12 @@ async function printLabels(ids) {
             </div>
 
             <div class="prod-price"
-  style="
-    margin-top:0;
-    line-height:1;
-    font-size:16px;
-    font-weight:800;
-  ">
-  <span class="mrp-tag">M.R.P</span>
-<span style="font-size:20px;font-weight:800;">
-  ${Number(p.sell_price).toFixed(0)}
-</span>
-
-            <div class="qr-code-target" data-index="${index}"></div>
-
-          </div>
+  style="margin-top:0;line-height:1;font-size:20px;font-weight:800;">
+  <span class="mrp-tag" style="font-size:20px;font-weight:800;">M.R.P</span>
+  <span style="font-size:22px;font-weight:900;">
+    ${Number(p.sell_price).toFixed(0)}
+  </span>
+</div>
         `,
       )
       .join("") +
