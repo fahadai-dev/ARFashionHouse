@@ -474,7 +474,7 @@ function printSelectedLabels() {
 async function printLabels(ids) {
   const items = PRODUCTS_CACHE.filter((p) => ids.includes(p.id));
   const area = document.getElementById("qrPrintArea");
-  const shopName = escapeHtml(CURRENT_SHOP?.name || "");
+  const shopName = "A.R Fashion House";
   area.innerHTML =
     '<div class="qr-label-sheet">' +
     items
