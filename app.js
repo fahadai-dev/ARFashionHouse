@@ -487,7 +487,7 @@ async function printLabels(ids) {
 
             <div class="shop-name top"
               style="
-                font-size:18px;
+                font-size:20px;
                 font-weight:800;
                 line-height:1;
                 margin-bottom:2px;
@@ -503,7 +503,7 @@ async function printLabels(ids) {
     font-size:16px;
     font-weight:800;
   ">
-  <span class="mrp-tag" style="font-size:16px;font-weight:800;">M.R.P</span>
+  <span class="mrp-tag" style="font-size:18px;font-weight:800;">M.R.P</span>
   ${Number(p.sell_price).toFixed(0)}
 </div>
 
