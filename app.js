@@ -503,9 +503,10 @@ async function printLabels(ids) {
     font-size:16px;
     font-weight:800;
   ">
-  <span class="mrp-tag" style="font-size:20px;font-weight:800;">M.R.P</span>
+  <span class="mrp-tag">M.R.P</span>
+<span style="font-size:20px;font-weight:800;">
   ${Number(p.sell_price).toFixed(0)}
-</div>
+</span>
 
             <div class="qr-code-target" data-index="${index}"></div>
 
