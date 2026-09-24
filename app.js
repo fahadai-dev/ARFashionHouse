@@ -131,12 +131,14 @@ async function createShopAndProfile(user, shopName, fullName) {
     .insert({ id: shopId, name: shopName, owner_id: user.id });
   if (shopErr) return shopErr.message;
 
-  const { error: profileErr } = await supabaseClient.from("profiles").insert({
-    id: user.id,
-    shop_id: shopId,
-    full_name: fullName,
-    role: "owner",
-  });
+  const { error: profileErr } = await supabaseClient
+    .from("profiles")
+    .insert({
+      id: user.id,
+      shop_id: shopId,
+      full_name: fullName,
+      role: "owner",
+    });
   if (profileErr) return profileErr.message;
 
   return null;
@@ -514,7 +516,7 @@ async function printLabels(ids) {
   for (const p of items) {
     if (p.code_type === "qr") {
       const canvas = document.createElement("canvas");
-      await QRCode.toCanvas(canvas, p.code, { width: 130, margin: 1 });
+      await QRCode.toCanvas(canvas, p.code, { width: 88, margin: 1 });
       document.getElementById("lbl-" + p.id).appendChild(canvas);
     } else {
       document.getElementById("lbl-" + p.id).innerHTML =
