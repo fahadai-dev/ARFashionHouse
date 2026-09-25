@@ -135,7 +135,7 @@
   .memo-a4 table{width:100%;border-collapse:collapse;margin-top:14px;}
   .memo-a4 th,.memo-a4 td{border:1px solid #ccc;padding:8px;font-size:14px;}
 
-  /* ---------- QR LABEL PRINT ---------- */
+/* ---------- QR LABEL PRINT ---------- */
 
 #qrPrintArea {
   display: none;
@@ -158,14 +158,11 @@
   #qrPrintArea {
     display: block !important;
     width: 40mm !important;
-    height: auto !important;
-    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
   .qr-label-sheet {
-    display: block !important;
     width: 40mm !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -182,8 +179,6 @@
     border: none !important;
     border-radius: 0 !important;
 
-    text-align: center;
-
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -194,44 +189,65 @@
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
+  /* SHOP NAME */
   .qr-label .shop-name.top {
     width: 100% !important;
 
-    font-size: 22px !important;
+    font-size: 16px !important;
     font-weight: 900 !important;
+
     line-height: 1 !important;
+
+    text-align: center !important;
 
     white-space: nowrap !important;
 
+    overflow: hidden !important;
+    text-overflow: clip !important;
+
     border-bottom: 1px solid #000 !important;
 
-    padding-bottom: 1mm !important;
-    margin-bottom: 1mm !important;
+    padding: 0 0 1mm 0 !important;
+    margin: 0 0 1mm 0 !important;
   }
 
+  /* MRP + PRICE */
   .qr-label .prod-price {
     width: 100% !important;
+
+    text-align: center !important;
 
     margin: 0 !important;
     padding: 0 !important;
 
     line-height: 1 !important;
 
-    font-size: 20px !important;
-    font-weight: 800 !important;
+    white-space: nowrap !important;
   }
 
   .qr-label .mrp-tag {
-    font-size: 20px !important;
+    font-size: 16px !important;
     font-weight: 900 !important;
   }
 
+  .qr-label .price-number {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+  }
+
+  /* QR */
   .qr-label .qr-code-target {
+    width: 14mm !important;
+    height: 14mm !important;
+
     margin: 1mm auto 0 !important;
     padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     line-height: 0 !important;
   }
@@ -239,10 +255,11 @@
   .qr-label .qr-code-target canvas {
     display: block !important;
 
-    width: 17mm !important;
-    height: 17mm !important;
+    width: 14mm !important;
+    height: 14mm !important;
 
-    margin: 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 

@@ -479,7 +479,6 @@ async function printLabels(ids) {
 
   const shopName = "A.R Fashion House";
 
-  // Label তৈরি
   area.innerHTML =
     '<div class="qr-label-sheet">' +
     items
@@ -487,45 +486,18 @@ async function printLabels(ids) {
         (p, index) => `
           <div class="qr-label">
 
-            <div class="shop-name top"
-              style="
-                font-size:22px;
-                font-weight:900;
-                line-height:1;
-                margin-bottom:2px;
-                white-space:nowrap;
-              ">
+            <div class="shop-name top">
               ${shopName}
             </div>
 
-            <div class="prod-price"
-              style="
-                margin-top:0;
-                line-height:1;
-              ">
-
-              <span class="mrp-tag"
-                style="
-                  font-size:20px;
-                  font-weight:900;
-                ">
-                M.R.P
-              </span>
-
-              <span
-                style="
-                  font-size:22px;
-                  font-weight:900;
-                ">
+            <div class="prod-price">
+              <span class="mrp-tag">M.R.P</span>
+              <span class="price-number">
                 ${Number(p.sell_price).toFixed(0)}
               </span>
-
             </div>
 
-            <div
-              class="qr-code-target"
-              data-index="${index}">
-            </div>
+            <div class="qr-code-target" data-index="${index}"></div>
 
           </div>
         `,
@@ -533,7 +505,6 @@ async function printLabels(ids) {
       .join("") +
     "</div>";
 
-  // QR Code তৈরি
   const targets = area.querySelectorAll(".qr-code-target");
 
   for (let i = 0; i < items.length; i++) {
@@ -542,8 +513,9 @@ async function printLabels(ids) {
     const canvas = document.createElement("canvas");
 
     await QRCode.toCanvas(canvas, p.code, {
-      width: 72,
-      margin: 0,
+      width: 56,
+      margin: 1,
+      errorCorrectionLevel: "M",
     });
 
     targets[i].appendChild(canvas);
