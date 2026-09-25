@@ -136,57 +136,115 @@
   .memo-a4 th,.memo-a4 td{border:1px solid #ccc;padding:8px;font-size:14px;}
 
   /* ---------- QR LABEL PRINT ---------- */
-  #qrPrintArea{display:none;}
-  @media print{
-    @page{ size: landscape; margin: 6mm; }
-    #qrPrintArea{
-      display:flex!important;
-      align-items:center;
-      justify-content:center;
-      min-height:100vh;
-    }
+
+#qrPrintArea {
+  display: none;
+}
+
+@media print {
+
+  @page {
+    size: 40mm 30mm;
+    margin: 0;
   }
-  .qr-label-sheet{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, 190px);
-    gap:10px;
-    margin:0 auto;
-    justify-content:center;
+
+  html,
+  body {
+    width: 40mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .qr-label{
-    width:190px;
-    border:1px solid #ccc;
-    border-radius:6px;
-    padding:10px 8px;
-    text-align:center;
-    font-family:'Hind Siliguri',sans-serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    page-break-inside:avoid;
-    break-inside:avoid;
+
+  #qrPrintArea {
+    display: block !important;
+    width: 40mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .qr-label .shop-name{
-    font-weight:800;
-    font-size:13px;
-    color:var(--brand-dark);
-    line-height:1.3;
-    width:100%;
+
+  .qr-label-sheet {
+    display: block !important;
+    width: 40mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .qr-label .shop-name.top{
-    border-bottom:1.5px solid var(--brand-dark);
-    padding-bottom:5px;
-    margin-bottom:6px;
+
+  .qr-label {
+    width: 40mm !important;
+    height: 30mm !important;
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+    padding: 1mm !important;
+
+    border: none !important;
+    border-radius: 0 !important;
+
+    text-align: center;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    overflow: hidden !important;
+
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
-  .qr-label .shop-name.bottom{
-    border-top:1.5px solid var(--brand-dark);
-    padding-top:5px;
-    margin-top:6px;
+
+  .qr-label .shop-name.top {
+    width: 100% !important;
+
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+
+    border-bottom: 1px solid #000 !important;
+
+    padding-bottom: 1mm !important;
+    margin-bottom: 1mm !important;
   }
-  .qr-label img,.qr-label canvas{display:block;margin:4px auto;width:88px;height:88px;}
-  .qr-label .prod-price{font-weight:800;font-size:13px;color:var(--ink);margin-bottom:2px;}
-  .qr-label .prod-price .mrp-tag{font-weight:700;font-size:13px;color:var(--muted);margin-right:3px;}
+
+  .qr-label .prod-price {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 1 !important;
+
+    font-size: 20px !important;
+    font-weight: 800 !important;
+  }
+
+  .qr-label .mrp-tag {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+  }
+
+  .qr-label .qr-code-target {
+    margin: 1mm auto 0 !important;
+    padding: 0 !important;
+
+    line-height: 0 !important;
+  }
+
+  .qr-label .qr-code-target canvas {
+    display: block !important;
+
+    width: 17mm !important;
+    height: 17mm !important;
+
+    margin: 0 auto !important;
+  }
+}
 
   @media(max-width:900px){
     .sidebar{display:none;}

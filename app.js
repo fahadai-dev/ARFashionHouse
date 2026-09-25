@@ -489,8 +489,8 @@ async function printLabels(ids) {
 
             <div class="shop-name top"
               style="
-                font-size:21px;
-                font-weight:800;
+                font-size:22px;
+                font-weight:900;
                 line-height:1;
                 margin-bottom:2px;
                 white-space:nowrap;
@@ -503,12 +503,29 @@ async function printLabels(ids) {
                 margin-top:0;
                 line-height:1;
               ">
-             <span class="mrp-tag" style="font-size:18px;font-weight:800;">M.R.P</span>
-             <span style="font-size:20px;font-weight:800;">
-              ${Number(p.sell_price).toFixed(0)}
+
+              <span class="mrp-tag"
+                style="
+                  font-size:20px;
+                  font-weight:900;
+                ">
+                M.R.P
+              </span>
+
+              <span
+                style="
+                  font-size:22px;
+                  font-weight:900;
+                ">
+                ${Number(p.sell_price).toFixed(0)}
+              </span>
+
             </div>
 
-            <div class="qr-code-target" data-index="${index}"></div>
+            <div
+              class="qr-code-target"
+              data-index="${index}">
+            </div>
 
           </div>
         `,
@@ -525,8 +542,8 @@ async function printLabels(ids) {
     const canvas = document.createElement("canvas");
 
     await QRCode.toCanvas(canvas, p.code, {
-      width: 88,
-      margin: 1,
+      width: 72,
+      margin: 0,
     });
 
     targets[i].appendChild(canvas);
