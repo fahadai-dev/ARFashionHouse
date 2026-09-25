@@ -15,7 +15,7 @@
     --brand:#1f6f4a; --brand-dark:#155238; --brand-light:#e8f5ef;
     --danger:#c0392b; --warn:#b8860b; --border:#e5e7eb;
     --radius:12px;
-  }
+    }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Hind Siliguri',sans-serif;background:var(--bg);color:var(--ink);}
   button{font-family:inherit;cursor:pointer;transition:all .15s ease;}
@@ -117,12 +117,15 @@
   /* ---------- PRINT MEMO ---------- */
   #printArea{display:none;}
   @media print{
-    body *{visibility:hidden;}
-    #printArea, #printArea *, #qrPrintArea, #qrPrintArea *{visibility:visible;}
-    #printArea{display:block;position:absolute;top:0;left:0;width:100%;}
-    .no-print{display:none!important;}
-  }
-  .memo-thermal{width:78mm;margin:0 auto;font-family:'Courier New',monospace;font-size:12px;padding:6px;}
+  @page{ size: 58mm auto; margin: 0; }
+  body{ margin: 0; }
+  body *{visibility:hidden;}
+  #printArea, #printArea *, #qrPrintArea, #qrPrintArea *{visibility:visible;}
+  #printArea{display:block;position:absolute;top:0;left:0;width:100%;}
+  .no-print{display:none!important;}
+}
+
+  .memo-thermal{width:58mm;margin:0 auto;font-family:'Courier New',monospace;font-size:12px;padding:6px;}
   .memo-thermal h2{text-align:center;font-size:15px;margin:2px 0;}
   .memo-thermal .center{text-align:center;}
   .memo-thermal hr{border:none;border-top:1px dashed #000;margin:6px 0;}
