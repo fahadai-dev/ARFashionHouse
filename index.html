@@ -119,9 +119,9 @@
   @media print{
   @page{ size: 58mm auto; margin: 0; }
   body{ margin: 0; }
-  body *{visibility:hidden;}
-  #printArea, #printArea *, #qrPrintArea, #qrPrintArea *{visibility:visible;}
-  #printArea{display:block;position:absolute;top:0;left:0;width:100%;}
+  body > *{ display:none !important; }
+  #printArea{ display:block !important; position:static; width:100%; }
+  #qrPrintArea{ display:block !important; }
   .no-print{display:none!important;}
 }
 
