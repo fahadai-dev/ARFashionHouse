@@ -118,7 +118,7 @@
   #printArea{display:none;}
   @media print{
   @page{ size: 58mm auto; margin: 0; }
-  body{ margin: 0; }
+  html, body{ height:auto !important; margin: 0; overflow:visible !important; }
   body > *{ display:none !important; }
   #printArea{ display:block !important; position:static; width:100%; }
   .no-print{display:none!important;}
