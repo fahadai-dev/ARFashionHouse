@@ -475,6 +475,8 @@ async function printLabels(ids) {
   const items = PRODUCTS_CACHE.filter((p) => ids.includes(p.id));
   const area = document.getElementById("qrPrintArea");
 
+  document.getElementById("printArea").innerHTML = "";
+
   const shopName = "A.R Fashion House";
 
   // Label তৈরি
@@ -858,6 +860,8 @@ function printMemo(sale) {
   const shopName = CURRENT_SHOP?.name || "দোকান";
   const shopAddr = CURRENT_SHOP?.address || "";
   const area = document.getElementById("printArea");
+
+  document.getElementById("qrPrintArea").innerHTML = "";
 
   const logoImg = CURRENT_SHOP?.logo_url
     ? `<img src="${CURRENT_SHOP.logo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 4px;">`
